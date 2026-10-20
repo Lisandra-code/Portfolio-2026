@@ -282,8 +282,8 @@
   /* works */
   .works-grid{
     display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 26px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
     margin-top: 24px;
   }
   .card{
@@ -306,6 +306,25 @@
   }
   .card:nth-child(2) .tape{ background: color-mix(in srgb, var(--green) 65%, white 35%); }
   .card:nth-child(3) .tape{ background: color-mix(in srgb, var(--gold) 60%, white 40%); }
+  .card:nth-child(4){ --tilt: 0.8deg; }
+  .card:nth-child(4) .tape{ background: color-mix(in srgb, var(--blue) 65%, white 35%); }
+
+  /* image placeholder: swap the div for <img class="card-img" src="..." alt="..."> later */
+  .card-img{
+    display:flex; align-items:center; justify-content:center;
+    width:100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    margin-bottom: 14px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--paper-deep) 80%, var(--ink) 4%);
+    border: 1.5px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    font-style: italic;
+  }
+  .card-tags{ list-style:none; margin:0 0 10px; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
+  .card-tags .card-tag{ margin-bottom:0; }
   .card-tag{
     display:inline-block;
     font-size: 0.72rem;
@@ -353,7 +372,7 @@
   }
 
   @media (max-width: 620px){
-    .home-grid, .about-grid{ grid-template-columns: 1fr; }
+    .home-grid, .about-grid, .works-grid{ grid-template-columns: 1fr; }
     .doodle{ justify-self:start; width:90px; }
     .tabs{ justify-content: center; padding-right:0; flex-wrap:wrap; }
     .tab{ font-size:0.82rem; padding:.55em 1em; }
