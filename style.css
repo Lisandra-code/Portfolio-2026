@@ -280,13 +280,45 @@
   .toc button { transition: none; }
 }
   /* works */
-  .works-grid{
-    display:grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 32px;
-    margin-top: 24px;
+  /* works: horizontal carousel, 2 cards in view (1 on a phone) */
+  .works-head{
+    display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap: 16px;
   }
+  .works-controls{ display:flex; align-items:center; gap: 10px; }
+  .works-count{ font-size: 0.85rem; color: var(--ink-soft); min-width: 3.5em; text-align:center; font-variant-numeric: tabular-nums; }
+  .arrow{
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 1.5px solid var(--ink); background: transparent; color: var(--ink);
+    display:inline-flex; align-items:center; justify-content:center;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .arrow:hover:not(:disabled){ background: color-mix(in srgb, var(--pink) 45%, transparent); transform: translateY(-1px); }
+  .arrow:focus-visible{ outline: 3px solid var(--ink); outline-offset: 2px; }
+  .arrow:disabled{ opacity: .3; cursor: default; }
+
+  .works-track{
+    --gap: 32px;
+    display:flex;
+    align-items:flex-start;
+    gap: var(--gap);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 8px;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    margin: 6px -8px 0;
+    /* room so the tape and the tilted cards are not cut off */
+    padding: 16px 8px 18px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--pink-deep) transparent;
+  }
+  .works-track:focus-visible{ outline: 3px solid var(--ink); outline-offset: 2px; border-radius: 10px; }
+  .works-track::-webkit-scrollbar{ height: 6px; }
+  .works-track::-webkit-scrollbar-thumb{ background: var(--pink-deep); border-radius: 999px; }
+
   .card{
+    flex: 0 0 calc((100% - var(--gap)) / 2);
+    scroll-snap-align: start;
     background: color-mix(in srgb, var(--paper) 90%, white 10%);
     border-radius: 10px;
     padding: 20px 20px 22px;
@@ -309,11 +341,10 @@
   .card:nth-child(4){ --tilt: 0.8deg; }
   .card:nth-child(4) .tape{ background: color-mix(in srgb, var(--blue) 65%, white 35%); }
 
-  /* image placeholder: swap the div for <img class="card-img" src="..." alt="..."> later */
   .card-img{
     display:flex; align-items:center; justify-content:center;
     width:100%;
-    aspect-ratio: 4/3;
+    aspect-ratio: 16/9;
     object-fit: cover;
     margin-bottom: 14px;
     border-radius: 6px;
@@ -322,6 +353,12 @@
     color: var(--ink-soft);
     font-size: 0.78rem;
     font-style: italic;
+  }
+  /* real images: show the whole image (no cropping) on a soft background */
+  img.card-img{
+    display:block; border:none;
+    object-fit: contain;
+    background: color-mix(in srgb, var(--paper-deep) 70%, var(--ink) 6%);
   }
   .card-tags{ list-style:none; margin:0 0 10px; padding:0; display:flex; flex-wrap:wrap; gap:6px; }
   .card-tags .card-tag{ margin-bottom:0; }
@@ -338,6 +375,88 @@
   }
   .card h3{ font-size:1.2rem; margin-bottom:6px; }
   .card p{ font-size:0.92rem; color: var(--ink-soft); margin:0; }
+  /* long descriptions show 3 lines, so all cards (and the folder) stay the same height */
+  .card p{
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; overflow:hidden;
+  }
+  /* the whole card opens the project: the title button stretches over the card */
+  .card-open{
+    all: unset;
+    cursor: pointer;
+  }
+  .card-open::after{ content:""; position:absolute; inset:0; border-radius: 10px; }
+  .card-open:focus-visible::after{ outline: 3px solid var(--ink); outline-offset: 3px; }
+  .card{ transition: transform .25s ease, box-shadow .25s ease; }
+  .card:hover{ transform: rotate(var(--tilt, -1deg)) translateY(-4px); box-shadow: 0 14px 24px var(--shadow-soft); }
+  /* a link inside a card sits above the clickable card */
+  .card-link{
+    position: relative; z-index: 1;
+    align-self: flex-start; margin-top: 10px;
+    display: inline-flex; align-items: center; gap: 6px; min-height: 36px;
+    padding: 4px 14px; border-radius: 999px;
+    background: var(--ink); color: var(--paper);
+    font-size: 0.85rem; font-weight: 600; text-decoration: none;
+  }
+  .card-link:hover{ background: color-mix(in srgb, var(--ink) 85%, var(--pink)); }
+  .card-link:focus-visible{ outline: 3px solid var(--ink); outline-offset: 2px; }
+  .project-text .card-link{ margin-top: 4px; }
+  .card-more{ margin-top: 10px; font-size: 0.85rem; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---------- project dialog ---------- */
+  #project{
+    width: min(980px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    padding: 0; border: none; border-radius: 14px;
+    background: var(--paper); color: var(--ink);
+    box-shadow: 0 30px 60px var(--shadow);
+    overflow: auto;
+  }
+  #project::backdrop{ background: rgba(46, 42, 32, 0.55); backdrop-filter: blur(2px); }
+  .project-inner{ position: relative; padding: clamp(18px, 3vw, 32px); display:flex; flex-direction:column; gap: 16px; }
+  .project-close{
+    position:absolute; top: 12px; right: 12px; z-index: 2;
+    width: 44px; height: 44px; border-radius: 50%;
+    border: none; background: var(--paper); color: var(--ink);
+    display:inline-flex; align-items:center; justify-content:center;
+    box-shadow: 0 4px 10px var(--shadow-soft);
+  }
+  .project-close:focus-visible{ outline: 3px solid var(--ink); outline-offset: 2px; }
+  .viewer{
+    position: relative;
+    background: color-mix(in srgb, var(--paper-deep) 70%, var(--ink) 6%);
+    border-radius: 10px;
+    height: min(62vh, 620px);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .viewer img{ max-width: 100%; max-height: 100%; object-fit: contain; display:block; }
+  .viewer .arrow{ position:absolute; top: 50%; transform: translateY(-50%); background: var(--paper); border-color: transparent; box-shadow: 0 4px 10px var(--shadow-soft); }
+  .viewer .arrow:hover:not(:disabled){ transform: translateY(-50%); }
+  .viewer-prev{ left: 12px; }
+  .viewer-next{ right: 12px; }
+  .viewer-count{
+    position:absolute; bottom: 10px; right: 12px;
+    font-size: 0.8rem; padding: 3px 10px; border-radius: 999px;
+    background: var(--paper); color: var(--ink-soft);
+  }
+  .thumbs{ display:flex; gap: 10px; overflow-x:auto; padding: 4px 2px; }
+  .thumbs button{
+    flex: 0 0 auto; width: 76px; height: 76px; padding: 0;
+    border-radius: 8px; border: 2px solid transparent; overflow:hidden;
+    background: color-mix(in srgb, var(--paper-deep) 70%, var(--ink) 6%);
+    opacity: .6;
+  }
+  .thumbs button[aria-current="true"]{ border-color: var(--ink); opacity: 1; }
+  .thumbs button:focus-visible{ outline: 3px solid var(--ink); outline-offset: 2px; }
+  .thumbs img{ width:100%; height:100%; object-fit: cover; display:block; }
+  .project-text{ max-width: 70ch; }
+  .project-text h2{ font-size: clamp(1.5rem, 3vw, 2rem); margin-top: 6px; }
+  .project-text p{ color: var(--ink-soft); line-height: 1.55; margin: 0 0 0.8em; }
+  .placeholder-note{ font-style: italic; color: var(--ink-soft); font-size: 0.9rem; }
+
+  @media (max-width: 620px){
+    .viewer{ height: 52vh; }
+    .viewer .arrow{ width: 38px; height: 38px; }
+  }
 
   /* about */
   .about-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:36px; margin-top:24px; }
@@ -372,12 +491,15 @@
   }
 
   @media (max-width: 620px){
-    .home-grid, .about-grid, .works-grid{ grid-template-columns: 1fr; }
+    .home-grid, .about-grid{ grid-template-columns: 1fr; }
+    .card{ flex-basis: 100%; }
     .doodle{ justify-self:start; width:90px; }
     .tabs{ justify-content: center; padding-right:0; flex-wrap:wrap; }
     .tab{ font-size:0.82rem; padding:.55em 1em; }
   }
 
   @media (prefers-reduced-motion: reduce){
-    #cover, .tab, .page, .card, .contact-links a{ transition:none !important; animation:none !important; }
+    #cover, .tab, .page, .card, .contact-links a, .arrow{ transition:none !important; animation:none !important; }
+    .works-track{ scroll-behavior: auto; }
+    .card:hover{ transform: rotate(var(--tilt, -1deg)); }
   }
