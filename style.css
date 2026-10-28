@@ -482,6 +482,7 @@
   }
   .contact-links a:hover{ transform: translateX(4px); }
   .contact-links a:focus-visible{ outline:3px solid var(--ink); outline-offset:2px; }
+  .contact-art{ display:block; width:100%; max-width:440px; height:auto; margin-top: 40px; }
 
   footer.note{
     margin-top: 34px;
@@ -503,3 +504,26 @@
     .works-track{ scroll-behavior: auto; }
     .card:hover{ transform: rotate(var(--tilt, -1deg)); }
   }
+  /* ---------- scale up on big screens ----------
+     On a normal laptop --z stays 1, so nothing changes.
+     On larger monitors the whole book (frame + content) grows together,
+     so the proportions stay the same as on the laptop.
+     vh/vw values inside a zoomed element are divided by --z so they still
+     fit the screen. */
+  :root{ --z: 1; }
+  @media (min-width: 1600px) and (min-height: 900px){ :root{ --z: 1.15; } }
+  @media (min-width: 1900px) and (min-height: 1000px){ :root{ --z: 1.3; } }
+  @media (min-width: 2300px) and (min-height: 1250px){ :root{ --z: 1.5; } }
+  @media (min-width: 3000px) and (min-height: 1600px){ :root{ --z: 1.9; } }
+
+  #book, .cover-card, #project{ zoom: var(--z); }
+  .page-frame{ min-height: calc(70vh / var(--z)); }
+  .cover-card{
+    width: min(560px, calc(92vw / var(--z)));
+    max-height: calc(82vh / var(--z));
+  }
+  #project{
+    width: min(980px, calc((100vw - 32px) / var(--z)));
+    max-height: calc((100vh - 32px) / var(--z));
+  }
+  .viewer{ height: min(calc(62vh / var(--z)), 620px); }
