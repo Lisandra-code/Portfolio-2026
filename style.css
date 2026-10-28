@@ -82,52 +82,63 @@
     perspective: 2400px;
   }
 
-  #cover{
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index: 40;
-    transform-origin: left center;
-    transform-style: preserve-3d;
-    transition: transform 0.9s cubic-bezier(.6,0,.3,1), opacity 0.7s ease 0.35s;
+  /* ---------- folder around the pages ----------
+     The back sits behind the pages and the front flap covers them,
+     so the folder is always exactly the size of the pages. */
+  .folder-back{
+    position:absolute; left:-16px; right:-16px; top: 30px; bottom:-18px;
+    background: color-mix(in srgb, var(--green-deep) 75%, var(--green));
+    border-radius: 0 16px 16px 16px;
+    box-shadow: 0 24px 44px var(--shadow);
+    z-index: 0;
+    transition: opacity .5s ease .55s;
   }
-  #cover.opened{
-    transform: rotateY(-108deg);
-    opacity: 0;
-    pointer-events:none;
-  }
-  #cover.hidden{ display:none; }
-
-  .cover-card{
-    width: min(560px, 92vw);
-    aspect-ratio: 3/4;
-    max-height: 82vh;
-    background:
-      linear-gradient(160deg, var(--green) 0%, var(--green) 38%, var(--pink) 100%);
-    border-radius: 10px;
-    box-shadow: 0 30px 60px var(--shadow), inset 0 0 0 6px rgba(255,255,255,0.18);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding: 10% 9%;
-    position:relative;
+  .folder-tab{
+    position:absolute; left:0; bottom:100%;
+    height: 36px; padding: 0 22px 0 18px;
+    display:flex; align-items:center;
+    background: inherit;
+    border-radius: 12px 16px 0 0;
+    font-size: 0.82rem; font-weight: 700; letter-spacing: .04em;
     color: #2b2a1f;
   }
-  .cover-card::after{
-    content:"";
-    position:absolute; inset:14px;
-    border: 1.5px solid rgba(255,255,255,0.55);
+  .sheet{ perspective: 1600px; }
+  .folder-front{
+    position:absolute; left:-16px; right:-16px; top: 34px; bottom:-18px;
+    z-index: 20;
+    background: linear-gradient(160deg, var(--green) 0%, var(--green) 40%, var(--pink) 100%);
+    border-radius: 6px 6px 16px 16px;
+    box-shadow: 0 -4px 12px rgba(46,42,32,.14), inset 0 1.5px 0 rgba(255,255,255,.45);
+    display:flex; align-items:center; justify-content:center;
+    color: #2b2a1f;
+    transform-origin: bottom center;
+    transition: transform .75s cubic-bezier(.6,0,.3,1), opacity .4s ease .5s;
+  }
+  /* opening: the flap folds down towards you, then the folder fades away */
+  #book.opening .folder-front{ transform: rotateX(-82deg); opacity: 0; pointer-events:none; }
+  #book.opening .folder-back{ opacity: 0; }
+  #book.opened .folder-front, #book.opened .folder-back{ display:none; }
+
+  .folder-label{
+    position: relative;
+    background: #FBF7EC;
     border-radius: 6px;
-    pointer-events:none;
+    padding: 26px 40px 22px;
+    text-align:center;
+    box-shadow: 0 6px 14px rgba(46,42,32,.16);
+    transform: rotate(-1.5deg);
+  }
+  .label-tape{
+    position:absolute; top:-11px; left:50%;
+    width: 70px; height: 22px;
+    transform: translateX(-50%) rotate(3deg);
+    background: color-mix(in srgb, var(--gold) 60%, white 40%);
+    opacity: .85;
   }
   .cover-eyebrow-mark{
     position:absolute;
-    top: 8%;
-    right: 10%;
+    top: 9%;
+    right: 6%;
     opacity: .85;
   }
   .cover-title{
@@ -138,7 +149,7 @@
     font-size: 1rem;
     letter-spacing: 0.02em;
     color: #3a3826;
-    margin-bottom: 2.2em;
+    margin-bottom: 1.4em;
   }
   .open-btn{
     border: 1.5px solid #2b2a1f;
@@ -164,7 +175,6 @@
     width: min(900px, 100%);
     position:relative;
   }
-  #book[hidden]{ display:none; }
 
   .tabs{
     display:flex;
@@ -500,7 +510,7 @@
   }
 
   @media (prefers-reduced-motion: reduce){
-    #cover, .tab, .page, .card, .contact-links a, .arrow{ transition:none !important; animation:none !important; }
+    .folder-front, .folder-back, .tab, .page, .card, .contact-links a, .arrow{ transition:none !important; animation:none !important; }
     .works-track{ scroll-behavior: auto; }
     .card:hover{ transform: rotate(var(--tilt, -1deg)); }
   }
@@ -516,14 +526,17 @@
   @media (min-width: 2300px) and (min-height: 1250px){ :root{ --z: 1.5; } }
   @media (min-width: 3000px) and (min-height: 1600px){ :root{ --z: 1.9; } }
 
-  #book, .cover-card, #project{ zoom: var(--z); }
+  #book, #project{ zoom: var(--z); }
   .page-frame{ min-height: calc(70vh / var(--z)); }
-  .cover-card{
-    width: min(560px, calc(92vw / var(--z)));
-    max-height: calc(82vh / var(--z));
-  }
   #project{
     width: min(980px, calc((100vw - 32px) / var(--z)));
     max-height: calc((100vh - 32px) / var(--z));
   }
   .viewer{ height: min(calc(62vh / var(--z)), 620px); }
+
+  @media (max-width: 620px){
+    .folder-label{ padding: 22px 26px 18px; }
+    .folder-back, .folder-front{ left:-8px; right:-8px; }
+    .folder-tab{ display:none; }   /* nav tabs are centred on phones, so no room for the label */
+    .folder-back{ border-radius: 16px; }
+  }

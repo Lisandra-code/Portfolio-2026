@@ -13,19 +13,9 @@
 
 <div id="stage">
 
-  <div id="cover">
-    <div class="cover-card">
-      <svg class="cover-eyebrow-mark" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M23 4 C 26 14, 32 17, 42 20 C 32 23, 26 26, 23 36 C 20 26, 14 23, 4 20 C 14 17, 20 14, 23 4 Z" stroke="#2b2a1f" stroke-width="1.4" fill="none"/>
-      </svg>
-      <h1 class="cover-title">Lisandra</h1>
-      <p class="cover-role">Design &amp; Communications</p>
-      <button class="open-btn" id="openBtn">Open</button>
-      <p class="cover-hint">tap to open</p>
-    </div>
-  </div>
-
-  <div id="book" hidden>
+  <div id="book" class="closed">
+    <!-- back of the folder, behind the pages -->
+    <div class="folder-back" aria-hidden="true"><span class="folder-tab">Portfolio 2026</span></div>
     <nav class="tabs" aria-label="Section navigation">
       <button class="tab active" data-page="home" aria-current="page">Home</button>
       <button class="tab" data-page="works">Works</button>
@@ -121,7 +111,7 @@
 
             <article class="card">
               <div class="tape"></div>
-              <img class="card-img" src="images/dkb logo.png" alt="logo for a client: the letters DKB in a bold, sans-serif font with a small pink dot above the K">
+              <img class="card-img" src="images/dkb-logo.png" alt="logo for a client: the letters DKB in a bold, sans-serif font with a small pink dot above the K">
               <ul class="card-tags">
                 <li class="card-tag">Branding</li>
                 <li class="card-tag">Web design</li>
@@ -245,6 +235,19 @@
           </svg>
         </section>
 
+      </div>
+      <!-- front flap of the folder: covers the pages until "Open" is clicked -->
+      <div class="folder-front" id="cover">
+        <svg class="cover-eyebrow-mark" width="40" height="40" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M23 4 C 26 14, 32 17, 42 20 C 32 23, 26 26, 23 36 C 20 26, 14 23, 4 20 C 14 17, 20 14, 23 4 Z" stroke="#2b2a1f" stroke-width="1.4" fill="none"/>
+        </svg>
+        <div class="folder-label">
+          <span class="label-tape" aria-hidden="true"></span>
+          <h1 class="cover-title">Lisandra</h1>
+          <p class="cover-role">Design &amp; Communications</p>
+          <button class="open-btn" id="openBtn">Open</button>
+          <p class="cover-hint">tap to open the folder</p>
+          </div>
       </div>
     </div>
   </div>

@@ -1,28 +1,34 @@
 (function(){
-  var cover = document.getElementById('cover');
   var book = document.getElementById('book');
   var openBtn = document.getElementById('openBtn');
+  var pageFrame = document.querySelector('.page-frame');
   var tabs = document.querySelectorAll('.tab');
   var pages = document.querySelectorAll('.page');
 
+  // the folder shows once per visit (per browser tab)
   var seenBefore = false;
-  try { seenBefore = localStorage.getItem('portfolio-book-opened') === '1'; } catch(e){}
+  try { seenBefore = sessionStorage.getItem('portfolio-book-opened') === '1'; } catch(e){}
 
   function openBook(skipAnim){
-    book.hidden = false;
+    if (!book.classList.contains('closed')) return;
+    book.classList.remove('closed');
+    pageFrame.inert = false;
     if (skipAnim) {
-      cover.classList.add('hidden');
+      book.classList.add('opened');
     } else {
-      cover.classList.add('opened');
-      window.setTimeout(function(){ cover.classList.add('hidden'); }, 950);
+      book.classList.add('opening');
+      window.setTimeout(function(){ book.classList.add('opened'); }, 1100);
     }
-    try { localStorage.setItem('portfolio-book-opened', '1'); } catch(e){}
+    try { sessionStorage.setItem('portfolio-book-opened', '1'); } catch(e){}
   }
 
   if (seenBefore) {
     openBook(true);
   } else {
+    pageFrame.inert = true;   // pages can't be clicked while the folder is closed
     openBtn.addEventListener('click', function(){ openBook(false); });
+    // clicking a tab while the folder is closed opens it too
+    tabs.forEach(function(t){ t.addEventListener('click', function(){ openBook(false); }); });
   }
 
   function goTo(name){
